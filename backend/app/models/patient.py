@@ -1,6 +1,6 @@
-from datetime import date
+from datetime import datetime
 
-from sqlalchemy import Date, Integer, String
+from sqlalchemy import DateTime, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.base import Base
@@ -16,20 +16,18 @@ class Patient(Base):
         index=True
     )
 
-    first_name: Mapped[str] = mapped_column(
-        String(100),
-        nullable=False
-    )
-
-    last_name: Mapped[str] = mapped_column(
-        String(100),
-        nullable=False
-    )
-
-    email: Mapped[str] = mapped_column(
+    name: Mapped[str] = mapped_column(
         String(150),
-        unique=True,
-        index=True,
+        nullable=False
+    )
+
+    age: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False
+    )
+
+    gender: Mapped[str] = mapped_column(
+        String(20),
         nullable=False
     )
 
@@ -38,7 +36,20 @@ class Patient(Base):
         nullable=True
     )
 
-    date_of_birth: Mapped[date | None] = mapped_column(
-        Date,
+    email: Mapped[str | None] = mapped_column(
+        String(150),
+        unique=True,
+        index=True,
         nullable=True
+    )
+
+    medical_history: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False
     )

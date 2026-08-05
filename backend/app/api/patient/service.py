@@ -14,10 +14,10 @@ def create_patient(
     )
 
 
-def get_all_patients(
+def get_patients(
     db: Session
 ):
-    return repository.get_all_patients(
+    return repository.get_patients(
         db=db
     )
 

@@ -6,14 +6,16 @@ from app.models.patient import Patient
 
 def create_patient(
     db: Session,
-    patient_data: PatientCreate
+    patient_data: PatientCreate,
 ) -> Patient:
+    """Create a new patient record in the database."""
     new_patient = Patient(
-        first_name=patient_data.first_name,
-        last_name=patient_data.last_name,
-        email=patient_data.email,
+        name=patient_data.name,
+        age=patient_data.age,
+        gender=patient_data.gender,
         phone=patient_data.phone,
-        date_of_birth=patient_data.date_of_birth
+        email=patient_data.email,
+        medical_history=patient_data.medical_history,
     )
 
     db.add(new_patient)
@@ -23,42 +25,33 @@ def create_patient(
     return new_patient
 
 
-def get_all_patients(
-    db: Session
-) -> list[Patient]:
+def get_patients(db: Session) -> list[Patient]:
+    """Return all patients from the database."""
     return db.query(Patient).all()
 
 
-def get_patient(
-    db: Session,
-    patient_id: int
-) -> Patient | None:
-    return (
-        db.query(Patient)
-        .filter(Patient.id == patient_id)
-        .first()
-    )
+def get_patient(db: Session, patient_id: int) -> Patient | None:
+    """Return a patient by ID."""
+    return db.query(Patient).filter(Patient.id == patient_id).first()
 
 
 def update_patient(
     db: Session,
     patient_id: int,
-    patient_data: PatientUpdate
+    patient_data: PatientUpdate,
 ) -> Patient | None:
-
-    patient = get_patient(
-        db=db,
-        patient_id=patient_id
-    )
+    """Update an existing patient record."""
+    patient = get_patient(db=db, patient_id=patient_id)
 
     if patient is None:
         return None
 
-    patient.first_name = patient_data.first_name
-    patient.last_name = patient_data.last_name
-    patient.email = patient_data.email
+    patient.name = patient_data.name
+    patient.age = patient_data.age
+    patient.gender = patient_data.gender
     patient.phone = patient_data.phone
-    patient.date_of_birth = patient_data.date_of_birth
+    patient.email = patient_data.email
+    patient.medical_history = patient_data.medical_history
 
     db.commit()
     db.refresh(patient)
@@ -66,15 +59,9 @@ def update_patient(
     return patient
 
 
-def delete_patient(
-    db: Session,
-    patient_id: int
-) -> Patient | None:
-
-    patient = get_patient(
-        db=db,
-        patient_id=patient_id
-    )
+def delete_patient(db: Session, patient_id: int) -> Patient | None:
+    """Delete a patient record from the database."""
+    patient = get_patient(db=db, patient_id=patient_id)
 
     if patient is None:
         return None

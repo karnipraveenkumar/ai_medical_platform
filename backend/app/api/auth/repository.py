@@ -8,10 +8,7 @@ def get_user_by_email(
     db: Session,
     email: str
 ) -> User | None:
-    statement = select(User).where(
-        User.email == email
-    )
-
+    statement = select(User).where(User.email == email)
     return db.scalar(statement)
 
 
@@ -19,16 +16,14 @@ def create_user(
     db: Session,
     full_name: str,
     email: str,
-    hashed_password: str
+    hashed_password: str,
 ) -> User:
     user = User(
         full_name=full_name,
         email=email,
-        hashed_password=hashed_password
+        hashed_password=hashed_password,
     )
-
     db.add(user)
     db.commit()
     db.refresh(user)
-
     return user
