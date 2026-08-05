@@ -6,13 +6,15 @@ from app.models.patient import Patient
 from app.api.patient.routes import router as patient_router
 
 
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(
+    bind=engine
+)
 
 
 app = FastAPI(
     title="AI Medical Platform API",
     version="1.0.0",
-    description="Backend API for the AI Medical Platform"
+    description="AI-powered medical platform backend"
 )
 
 
@@ -30,4 +32,6 @@ def health_check():
     }
 
 
-app.include_router(patient_router)
+app.include_router(
+    patient_router
+)

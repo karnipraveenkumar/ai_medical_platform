@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+﻿from sqlalchemy.orm import Session
 
 from app.api.patient import repository
 from app.api.patient.schemas import PatientCreate, PatientUpdate
