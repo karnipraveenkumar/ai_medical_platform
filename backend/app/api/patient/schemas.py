@@ -1,34 +1,31 @@
-﻿from datetime import datetime
+﻿from datetime import date
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class PatientCreate(BaseModel):
-    name: str = Field(min_length=2, max_length=150)
-    age: int = Field(ge=0, le=130)
-    gender: str = Field(min_length=1, max_length=20)
+    first_name: str = Field(min_length=1, max_length=100)
+    last_name: str = Field(min_length=1, max_length=100)
+    email: EmailStr
     phone: str | None = None
-    email: EmailStr | None = None
-    medical_history: str | None = None
+    date_of_birth: date | None = None
 
 
 class PatientUpdate(BaseModel):
-    name: str = Field(min_length=2, max_length=150)
-    age: int = Field(ge=0, le=130)
-    gender: str = Field(min_length=1, max_length=20)
-    phone: str | None = None
+    # Partial updates: all fields optional
+    first_name: str | None = Field(default=None, min_length=1, max_length=100)
+    last_name: str | None = Field(default=None, min_length=1, max_length=100)
     email: EmailStr | None = None
-    medical_history: str | None = None
+    phone: str | None = None
+    date_of_birth: date | None = None
 
 
 class PatientResponse(BaseModel):
     id: int
-    name: str
-    age: int
-    gender: str
+    first_name: str
+    last_name: str
+    email: EmailStr
     phone: str | None = None
-    email: EmailStr | None = None
-    medical_history: str | None = None
-    created_at: datetime
+    date_of_birth: date | None = None
 
     model_config = ConfigDict(from_attributes=True)

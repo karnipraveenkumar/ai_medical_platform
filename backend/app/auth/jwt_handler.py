@@ -1,25 +1,44 @@
+import os
 from datetime import datetime, timedelta, timezone
 
+from dotenv import load_dotenv
 from jose import jwt
 
 
-SECRET_KEY = "change-this-secret-key-before-production"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+
+ALGORITHM = os.getenv(
+    "ALGORITHM",
+    "HS256",
+)
+
+ACCESS_TOKEN_EXPIRE_MINUTES = int(
+    os.getenv(
+        "ACCESS_TOKEN_EXPIRE_MINUTES",
+        "60",
+    )
+)
 
 
 def create_access_token(
     data: dict,
-    expires_delta: timedelta | None = None
+    expires_delta: timedelta | None = None,
 ) -> str:
     payload = data.copy()
 
     if expires_delta is not None:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = (
+            datetime.now(timezone.utc)
+            + expires_delta
+        )
     else:
         expire = (
             datetime.now(timezone.utc)
-            + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            + timedelta(
+                minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+            )
         )
 
     payload["exp"] = expire
@@ -27,5 +46,5 @@ def create_access_token(
     return jwt.encode(
         payload,
         SECRET_KEY,
-        algorithm=ALGORITHM
+        algorithm=ALGORITHM,
     )

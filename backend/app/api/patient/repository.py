@@ -1,4 +1,7 @@
 ﻿from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
+from fastapi import HTTPException, status
 
 from app.api.patient.schemas import PatientCreate, PatientUpdate
 from app.models.patient import Patient
@@ -9,18 +12,33 @@ def create_patient(
     patient_data: PatientCreate,
 ) -> Patient:
     """Create a new patient record in the database."""
+    # Pre-check for duplicate email to return a friendly 409
+    if patient_data.email:
+        existing = db.query(Patient).filter(Patient.email == patient_data.email).first()
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="A patient with this email already exists.",
+            )
+
     new_patient = Patient(
-        name=patient_data.name,
-        age=patient_data.age,
-        gender=patient_data.gender,
-        phone=patient_data.phone,
+        first_name=patient_data.first_name,
+        last_name=patient_data.last_name,
         email=patient_data.email,
-        medical_history=patient_data.medical_history,
+        phone=patient_data.phone,
+        date_of_birth=patient_data.date_of_birth,
     )
 
     db.add(new_patient)
-    db.commit()
-    db.refresh(new_patient)
+    try:
+        db.commit()
+        db.refresh(new_patient)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A patient with this email already exists.",
+        )
 
     return new_patient
 
@@ -40,21 +58,40 @@ def update_patient(
     patient_id: int,
     patient_data: PatientUpdate,
 ) -> Patient | None:
-    """Update an existing patient record."""
+    """Update an existing patient record with only provided fields."""
     patient = get_patient(db=db, patient_id=patient_id)
 
     if patient is None:
         return None
 
-    patient.name = patient_data.name
-    patient.age = patient_data.age
-    patient.gender = patient_data.gender
-    patient.phone = patient_data.phone
-    patient.email = patient_data.email
-    patient.medical_history = patient_data.medical_history
+    # Update only provided fields (partial update)
+    if patient_data.first_name is not None:
+        patient.first_name = patient_data.first_name
+    if patient_data.last_name is not None:
+        patient.last_name = patient_data.last_name
+    if patient_data.email is not None:
+        # Check duplicate email
+        existing = db.query(Patient).filter(Patient.email == patient_data.email, Patient.id != patient_id).first()
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="A patient with this email already exists.",
+            )
+        patient.email = patient_data.email
+    if patient_data.phone is not None:
+        patient.phone = patient_data.phone
+    if patient_data.date_of_birth is not None:
+        patient.date_of_birth = patient_data.date_of_birth
 
-    db.commit()
-    db.refresh(patient)
+    try:
+        db.commit()
+        db.refresh(patient)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A patient with this email already exists.",
+        )
 
     return patient
 
@@ -67,6 +104,10 @@ def delete_patient(db: Session, patient_id: int) -> Patient | None:
         return None
 
     db.delete(patient)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise
 
     return patient
