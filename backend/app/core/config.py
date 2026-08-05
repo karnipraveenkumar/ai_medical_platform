@@ -41,3 +41,16 @@ class Settings:
 
 
 settings = Settings()
+
+# Validate SECRET_KEY only for non-development environments to avoid
+# breaking local dev or tests. Consumers should set APP_ENV to
+# "production" or "staging" in those deployments.
+_app_env = os.getenv("APP_ENV", "development").lower()
+if _app_env in ("production", "staging"):
+    # Do not expose the secret value in error messages or logs.
+    _secret = settings.SECRET_KEY
+    if not _secret or _secret == "dev-secret-change-me" or len(_secret) < 32:
+        raise RuntimeError(
+            "SECRET_KEY is not configured for production/staging. "
+            "Set a strong SECRET_KEY via environment variables."
+        )

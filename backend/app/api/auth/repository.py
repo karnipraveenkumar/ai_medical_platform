@@ -1,5 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from fastapi import HTTPException, status
 
 from app.models.user import User
 
@@ -32,6 +34,16 @@ def create_user(
         hashed_password=hashed_password,
     )
     db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
+    try:
+        db.commit()
+        db.refresh(user)
+        return user
+    except IntegrityError:
+        # Ensure the session is clean for the caller and raise a
+        # controlled HTTP error matching the existing duplicate-email
+        # behavior used elsewhere in the codebase.
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email is already registered",
+        )
