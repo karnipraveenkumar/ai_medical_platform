@@ -1,6 +1,18 @@
+# Virtual environment
 venv/
-.env.example
+.venv/
+
+# Environment files
+.env
+.env.*
+
+# Keep example env file
+!.env.example
+
+# Python
 __pycache__/
 *.pyc
-/.idea/
-/.vscode/
+
+# IDE
+.idea/
+.vscode/

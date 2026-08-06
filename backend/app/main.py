@@ -6,11 +6,9 @@ from app.models.doctor import Doctor
 from app.models.medical_record import MedicalRecord
 from app.models.patient import Patient
 from app.models.user import User
-from app.api.ai.routes import router as ai_router
-from app.api.doctor.routes import router as doctor_router
-from app.api.patient.routes import router as patient_router
 from app.api.auth.routes import router as auth_router
 from app.api.doctor.routes import router as doctor_router
+from app.api.patient.routes import router as patient_router
 from app.api.ai.routes import router as ai_router
 
 
