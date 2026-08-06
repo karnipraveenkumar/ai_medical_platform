@@ -21,7 +21,10 @@ import httpx
 logger = logging.getLogger(__name__)
 
 GROQ_API_KEY: Optional[str] = os.getenv("GROQ_API_KEY")
-GROQ_API_BASE_URL: str = os.getenv("GROQ_API_BASE_URL", "https://api.groq.ai/v1")
+GROQ_API_BASE_URL: str = os.getenv(
+    "GROQ_API_BASE_URL",
+    "https://api.groq.com/openai/v1"
+)
 
 
 def _auth_headers() -> Dict[str, str]:
@@ -32,7 +35,7 @@ def _auth_headers() -> Dict[str, str]:
 
 def get_completion(
     prompt: str,
-    model: str = "groq-1",
+    model: str = "llama-3.3-70b-versatile",
     max_tokens: int = 512,
     temperature: float = 0.0,
     timeout: int = 30,
@@ -48,13 +51,18 @@ def get_completion(
     if not GROQ_API_KEY:
         raise RuntimeError("GROQ_API_KEY is not set in the environment")
 
-    url = f"{GROQ_API_BASE_URL}/completions"
+    url = f"{GROQ_API_BASE_URL}/chat/completions"
     payload: Dict[str, Any] = {
-        "model": model,
-        "inputs": prompt,
-        "max_tokens": max_tokens,
-        "temperature": temperature,
-    }
+    "model": model,
+    "messages": [
+        {
+            "role": "user",
+            "content": prompt
+        }
+    ],
+    "max_tokens": max_tokens,
+    "temperature": temperature,
+}
 
     try:
         with httpx.Client(timeout=timeout) as client:
