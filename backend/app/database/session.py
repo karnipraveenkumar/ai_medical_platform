@@ -1,17 +1,6 @@
-﻿from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+﻿from sqlalchemy.orm import sessionmaker
 
-from app.core.config import settings
-
-
-# Use the DATABASE_URL built/loaded in app.core.config
-DATABASE_URL = settings.DATABASE_URL
-
-
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,
-)
+from app.database.database import engine
 
 
 SessionLocal = sessionmaker(
