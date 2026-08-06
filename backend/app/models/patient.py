@@ -1,18 +1,24 @@
-from datetime import date
+from datetime import datetime
 
-from sqlalchemy import Date, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
 
 
 class Patient(Base):
-
     __tablename__ = "patients"
 
     id: Mapped[int] = mapped_column(
         Integer,
         primary_key=True,
+        index=True,
+    )
+
+    user_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
         index=True,
     )
 
@@ -38,7 +44,40 @@ class Patient(Base):
         nullable=True,
     )
 
-    date_of_birth: Mapped[date | None] = mapped_column(
-        Date,
+    date_of_birth: Mapped[str | None] = mapped_column(
+        String(20),
         nullable=True,
+    )
+
+    age: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    gender: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+    )
+
+    phone_number: Mapped[str | None] = mapped_column(
+        String(50),
+        nullable=True,
+    )
+
+    address: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+    )
+
+    user = relationship("User", back_populates="patients")
+    medical_records = relationship(
+        "MedicalRecord",
+        back_populates="patient",
+        cascade="all, delete-orphan",
     )

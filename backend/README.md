@@ -15,17 +15,23 @@ pip install -r backend/requirements.txt
 ```
 
 **Environment Setup**
-- Copy `.env.example` to `.env` in the `backend` folder and set values:
+- Copy `.env.example` to `.env` in the `backend` folder and update the values for your local PostgreSQL instance.
 
 ```text
-DATABASE_URL=postgresql://postgres:password@localhost:5432/ai_medical_db
+DATABASE_URL=postgresql+psycopg://postgres:password@localhost:5432/ai_medical_db
 SECRET_KEY=your-secure-secret
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
+APP_ENV=development
 ```
 
+- Do not commit `.env`; it is local developer configuration only. The project loads environment variables using `python-dotenv` from `app/core/config.py`.
+
 **Database Setup**
-- The application will create tables automatically on startup using SQLAlchemy `Base.metadata.create_all` (for the `app` entrypoint). For production, use Alembic migrations.
+- The application is intended to run against PostgreSQL in development and production.
+- Current configuration is active in `backend/app/core/config.py` and reads `DATABASE_URL` from `.env`.
+- `app/main.py` imports all models before `Base.metadata.create_all(bind=engine)`, so table creation uses the configured PostgreSQL database.
+- In production, prefer Alembic migrations instead of `create_all()`; `alembic` is already listed in requirements and `alembic.ini` exists, but migration configuration should be completed separately.
 
 Postgres example (create DB and user):
 ```bash

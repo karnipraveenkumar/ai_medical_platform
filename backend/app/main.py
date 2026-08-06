@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from app.database.base import Base
 from app.database.database import engine
 from app.models.doctor import Doctor
+from app.models.medical_record import MedicalRecord
 from app.models.patient import Patient
 from app.models.user import User
 from app.api.ai.routes import router as ai_router

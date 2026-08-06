@@ -15,6 +15,8 @@ def _build_database_url() -> str:
     # and safely encode the password.
     env_url = os.getenv("DATABASE_URL")
     if env_url:
+        if env_url.startswith("postgresql://"):
+            return env_url.replace("postgresql://", "postgresql+psycopg://", 1)
         return env_url
 
     user = os.getenv("POSTGRES_USER", "postgres")
