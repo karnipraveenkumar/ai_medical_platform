@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime, date
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy import Date, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
@@ -44,8 +44,9 @@ class Patient(Base):
         nullable=True,
     )
 
-    date_of_birth: Mapped[str | None] = mapped_column(
-        String(20),
+    # ✅ FIXED
+    date_of_birth: Mapped[date | None] = mapped_column(
+        Date,
         nullable=True,
     )
 
@@ -75,7 +76,11 @@ class Patient(Base):
         nullable=False,
     )
 
-    user = relationship("User", back_populates="patients")
+    user = relationship(
+        "User",
+        back_populates="patients",
+    )
+
     medical_records = relationship(
         "MedicalRecord",
         back_populates="patient",

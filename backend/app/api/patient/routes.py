@@ -31,8 +31,8 @@ def create_patient(
     return service.create_patient(
         db=db,
         patient_data=patient,
+        owner_id=current_user.id,
     )
-
 
 @router.get(
     "/",
@@ -42,7 +42,7 @@ def get_patients(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return service.get_patients(db=db)
+    return service.get_patients(db=db, owner_id=current_user.id)
 
 
 @router.get(
@@ -54,7 +54,9 @@ def get_patient(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    patient = service.get_patient(db=db, patient_id=patient_id)
+    patient = service.get_patient(
+        db=db, patient_id=patient_id, owner_id=current_user.id
+    )
 
     if patient is None:
         raise HTTPException(
@@ -79,6 +81,7 @@ def update_patient(
         db=db,
         patient_id=patient_id,
         patient_data=patient_data,
+        owner_id=current_user.id,
     )
 
     if patient is None:
@@ -102,6 +105,7 @@ def delete_patient(
     patient = service.delete_patient(
         db=db,
         patient_id=patient_id,
+        owner_id=current_user.id,
     )
 
     if patient is None:

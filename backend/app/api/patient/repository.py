@@ -10,8 +10,9 @@ from app.models.patient import Patient
 def create_patient(
     db: Session,
     patient_data: PatientCreate,
+    owner_id: int,
 ) -> Patient:
-    """Create a new patient record in the database."""
+    """Create a new patient record owned by the authenticated user."""
     # Pre-check for duplicate email to return a friendly 409
     if patient_data.email:
         existing = db.query(Patient).filter(Patient.email == patient_data.email).first()
@@ -22,6 +23,7 @@ def create_patient(
             )
 
     new_patient = Patient(
+        user_id=owner_id,
         first_name=patient_data.first_name,
         last_name=patient_data.last_name,
         email=patient_data.email,
@@ -43,23 +45,28 @@ def create_patient(
     return new_patient
 
 
-def get_patients(db: Session) -> list[Patient]:
-    """Return all patients from the database."""
-    return db.query(Patient).all()
+def get_patients(db: Session, owner_id: int) -> list[Patient]:
+    """Return all patients owned by the given user."""
+    return db.query(Patient).filter(Patient.user_id == owner_id).all()
 
 
-def get_patient(db: Session, patient_id: int) -> Patient | None:
-    """Return a patient by ID."""
-    return db.query(Patient).filter(Patient.id == patient_id).first()
+def get_patient(db: Session, patient_id: int, owner_id: int) -> Patient | None:
+    """Return a patient by ID, scoped to the owning user."""
+    return (
+        db.query(Patient)
+        .filter(Patient.id == patient_id, Patient.user_id == owner_id)
+        .first()
+    )
 
 
 def update_patient(
     db: Session,
     patient_id: int,
     patient_data: PatientUpdate,
+    owner_id: int,
 ) -> Patient | None:
     """Update an existing patient record with only provided fields."""
-    patient = get_patient(db=db, patient_id=patient_id)
+    patient = get_patient(db=db, patient_id=patient_id, owner_id=owner_id)
 
     if patient is None:
         return None
@@ -96,9 +103,9 @@ def update_patient(
     return patient
 
 
-def delete_patient(db: Session, patient_id: int) -> Patient | None:
+def delete_patient(db: Session, patient_id: int, owner_id: int) -> Patient | None:
     """Delete a patient record from the database."""
-    patient = get_patient(db=db, patient_id=patient_id)
+    patient = get_patient(db=db, patient_id=patient_id, owner_id=owner_id)
 
     if patient is None:
         return None

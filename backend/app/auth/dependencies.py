@@ -16,10 +16,10 @@ def get_current_user(
 ) -> User:
 
     print("=" * 60)
-    print("TOKEN RECEIVED:", repr(token))
+    print("TOKEN RECEIVED:", token)
 
     if not token:
-        print("ERROR: No token received")
+        print("NO TOKEN")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
@@ -30,7 +30,7 @@ def get_current_user(
         payload = decode_access_token(token)
         print("PAYLOAD:", payload)
     except Exception as e:
-        print("TOKEN DECODE ERROR:", e)
+        print("TOKEN ERROR:", e)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired authentication token",
@@ -38,22 +38,20 @@ def get_current_user(
         )
 
     user_id = payload.get("sub")
-    print("USER ID FROM TOKEN:", user_id)
+    print("USER ID:", user_id)
 
     if user_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication token payload",
-            headers={"WWW-Authenticate": "Bearer"},
         )
 
     try:
         user_id = int(user_id)
-    except Exception:
+    except ValueError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication token payload",
-            headers={"WWW-Authenticate": "Bearer"},
+            detail="Invalid user id",
         )
 
     user = get_user_by_id(db=db, user_id=user_id)
@@ -63,13 +61,6 @@ def get_current_user(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authenticated user not found",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    if not user.is_active:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="User account is inactive",
         )
 
     print("AUTH SUCCESS")
