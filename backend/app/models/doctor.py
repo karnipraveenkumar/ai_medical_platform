@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
@@ -15,10 +15,11 @@ class Doctor(Base):
         index=True,
     )
 
-    user_id: Mapped[int] = mapped_column(
+    user_id: Mapped[int | None] = mapped_column(
         Integer,
         ForeignKey("users.id", ondelete="CASCADE"),
-        nullable=False,
+        nullable=True,
+        unique=True,
         index=True,
     )
 
@@ -27,13 +28,24 @@ class Doctor(Base):
         nullable=False,
     )
 
-    specialization: Mapped[str] = mapped_column(
+    specialty: Mapped[str | None] = mapped_column(
+        String(150),
+        nullable=True,
+    )
+
+    email: Mapped[str] = mapped_column(
         String(150),
         nullable=False,
     )
 
-    experience: Mapped[int] = mapped_column(
-        Integer,
+    phone: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
+        default=True,
         nullable=False,
     )
 
@@ -43,9 +55,12 @@ class Doctor(Base):
         nullable=False,
     )
 
-    user = relationship("User", back_populates="doctors")
+    user = relationship(
+        "User",
+        back_populates="doctor",
+    )
+
     medical_records = relationship(
         "MedicalRecord",
         back_populates="doctor",
-        cascade="all, delete-orphan",
     )

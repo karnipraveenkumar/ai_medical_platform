@@ -11,7 +11,7 @@ class DoctorCreate(BaseModel):
 
 
 class DoctorUpdate(BaseModel):
-    full_name: str
+    full_name: str | None = None
     specialty: str | None = None
     phone: str | None = None
 
@@ -19,9 +19,9 @@ class DoctorUpdate(BaseModel):
 class DoctorResponse(BaseModel):
     id: int
     full_name: str
-    specialty: str | None = None
+    specialty: str | None
     email: EmailStr
-    phone: str | None = None
+    phone: str | None
     is_active: bool
     created_at: datetime
 

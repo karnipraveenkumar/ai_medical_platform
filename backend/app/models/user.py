@@ -50,14 +50,17 @@ class User(Base):
         nullable=False,
     )
 
+
     patients = relationship(
         "Patient",
         back_populates="user",
         cascade="all, delete-orphan",
     )
 
-    doctors = relationship(
+
+    doctor = relationship(
         "Doctor",
         back_populates="user",
         cascade="all, delete-orphan",
+        uselist=False,
     )
