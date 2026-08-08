@@ -20,7 +20,7 @@ class DoctorResponse(BaseModel):
     id: int
     full_name: str
     specialty: str | None
-    email: EmailStr
+    email: EmailStr | None = None
     phone: str | None
     is_active: bool
     created_at: datetime
