@@ -1,6 +1,5 @@
 ﻿from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-
 from fastapi import HTTPException, status
 
 from app.api.patient.schemas import PatientCreate, PatientUpdate
@@ -13,9 +12,14 @@ def create_patient(
     owner_id: int,
 ) -> Patient:
     """Create a new patient record owned by the authenticated user."""
-    # Pre-check for duplicate email to return a friendly 409
+
     if patient_data.email:
-        existing = db.query(Patient).filter(Patient.email == patient_data.email).first()
+        existing = (
+            db.query(Patient)
+            .filter(Patient.email == patient_data.email)
+            .first()
+        )
+
         if existing:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -32,29 +36,48 @@ def create_patient(
     )
 
     db.add(new_patient)
+
     try:
         db.commit()
         db.refresh(new_patient)
-    except IntegrityError:
+    except IntegrityError as exc:
         db.rollback()
+        print("PATIENT CREATE INTEGRITY ERROR:", exc)
+
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="A patient with this email already exists.",
+            detail="Patient could not be created because of a database constraint.",
         )
 
     return new_patient
 
 
-def get_patients(db: Session, owner_id: int) -> list[Patient]:
-    """Return all patients owned by the given user."""
-    return db.query(Patient).filter(Patient.user_id == owner_id).all()
+def get_patients(
+    db: Session,
+    owner_id: int,
+) -> list[Patient]:
+    """Return all patients owned by the authenticated user."""
 
-
-def get_patient(db: Session, patient_id: int, owner_id: int) -> Patient | None:
-    """Return a patient by ID, scoped to the owning user."""
     return (
         db.query(Patient)
-        .filter(Patient.id == patient_id, Patient.user_id == owner_id)
+        .filter(Patient.user_id == owner_id)
+        .all()
+    )
+
+
+def get_patient(
+    db: Session,
+    patient_id: int,
+    owner_id: int,
+) -> Patient | None:
+    """Return a patient by ID belonging to the authenticated user."""
+
+    return (
+        db.query(Patient)
+        .filter(
+            Patient.id == patient_id,
+            Patient.user_id == owner_id,
+        )
         .first()
     )
 
@@ -65,52 +88,80 @@ def update_patient(
     patient_data: PatientUpdate,
     owner_id: int,
 ) -> Patient | None:
-    """Update an existing patient record with only provided fields."""
-    patient = get_patient(db=db, patient_id=patient_id, owner_id=owner_id)
+    """Update an existing patient."""
+
+    patient = get_patient(
+        db=db,
+        patient_id=patient_id,
+        owner_id=owner_id,
+    )
 
     if patient is None:
         return None
 
-    # Update only provided fields (partial update)
     if patient_data.first_name is not None:
         patient.first_name = patient_data.first_name
+
     if patient_data.last_name is not None:
         patient.last_name = patient_data.last_name
+
     if patient_data.email is not None:
-        # Check duplicate email
-        existing = db.query(Patient).filter(Patient.email == patient_data.email, Patient.id != patient_id).first()
+        existing = (
+            db.query(Patient)
+            .filter(
+                Patient.email == patient_data.email,
+                Patient.id != patient_id,
+            )
+            .first()
+        )
+
         if existing:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="A patient with this email already exists.",
             )
+
         patient.email = patient_data.email
+
     if patient_data.phone is not None:
         patient.phone = patient_data.phone
+
     if patient_data.date_of_birth is not None:
         patient.date_of_birth = patient_data.date_of_birth
 
     try:
         db.commit()
         db.refresh(patient)
-    except IntegrityError:
+    except IntegrityError as exc:
         db.rollback()
+        print("PATIENT UPDATE INTEGRITY ERROR:", exc)
+
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="A patient with this email already exists.",
+            detail="Patient could not be updated because of a database constraint.",
         )
 
     return patient
 
 
-def delete_patient(db: Session, patient_id: int, owner_id: int) -> Patient | None:
-    """Delete a patient record from the database."""
-    patient = get_patient(db=db, patient_id=patient_id, owner_id=owner_id)
+def delete_patient(
+    db: Session,
+    patient_id: int,
+    owner_id: int,
+) -> Patient | None:
+    """Delete a patient belonging to the authenticated user."""
+
+    patient = get_patient(
+        db=db,
+        patient_id=patient_id,
+        owner_id=owner_id,
+    )
 
     if patient is None:
         return None
 
     db.delete(patient)
+
     try:
         db.commit()
     except IntegrityError:
