@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900">
+  <defs>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.10" />
+      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0.04" />
+    </linearGradient>
+  </defs>
+
+  <!-- Concentric tech rings, echoing a radar/pulse motif -->
+  <g transform="translate(650,650)" fill="none" stroke="url(#ringGrad)">
+    <circle r="120" stroke-width="18" />
+    <circle r="180" stroke-width="14" />
+    <circle r="240" stroke-width="10" />
+    <circle r="300" stroke-width="6" />
+  </g>
+
+  <!-- Center medallion -->
+  <circle cx="650" cy="650" r="70" fill="#ffffff" fill-opacity="0.55" stroke="#bfdbfe" stroke-width="1.5" />
+
+  <!-- Simple caduceus-style glyph (two curved wings + a staff), original line-art -->
+  <g transform="translate(650,650)" stroke="#2563eb" stroke-opacity="0.55" stroke-width="3" fill="none" stroke-linecap="round">
+    <line x1="0" y1="-28" x2="0" y2="28" />
+    <path d="M0,-20 C -22,-10 -22,10 0,0 C 22,-10 22,10 0,20" />
+    <path d="M-14,-24 l-8,-8 M14,-24 l8,-8" />
+  </g>
+
+  <!-- Faint hexagon health-icon cluster, top-left of the medallion -->
+  <g fill="none" stroke="#93c5fd" stroke-opacity="0.35" stroke-width="1.5">
+    <polygon points="480,560 500,548 520,560 520,584 500,596 480,584" />
+    <polygon points="530,540 550,528 570,540 570,564 550,576 530,564" />
+    <polygon points="480,610 500,598 520,610 520,634 500,646 480,634" />
+  </g>
+
+  <!-- Small heartbeat pulse line accent -->
+  <polyline points="120,780 180,780 200,740 220,810 240,760 260,780 320,780"
+    fill="none" stroke="#2563eb" stroke-opacity="0.12" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
