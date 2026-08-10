@@ -517,7 +517,7 @@ function initChatAssistant() {
         const userMsg = document.createElement('div');
         userMsg.className = 'chat-message user';
         userMsg.innerHTML = `<div class="bubble">${escapeHtml(msgText)}</div>`;
-        chatContainer.appendChild(userMsg);
+        chatContainer.appendChild(userMsg);  
 
         if (!text) input.value = '';
         chatContainer.scrollTop = chatContainer.scrollHeight;
