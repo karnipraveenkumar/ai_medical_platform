@@ -7,7 +7,9 @@ from app.database.base import Base
 
 
 class User(Base):
+
     __tablename__ = "users"
+
 
     id: Mapped[int] = mapped_column(
         Integer,
@@ -15,52 +17,55 @@ class User(Base):
         index=True
     )
 
+
     email: Mapped[str] = mapped_column(
         String(150),
         unique=True,
-        index=True,
         nullable=False,
+        index=True
     )
+
 
     hashed_password: Mapped[str] = mapped_column(
         String(255),
-        nullable=False,
+        nullable=False
     )
+
 
     role: Mapped[str] = mapped_column(
         String(50),
-        nullable=False,
         default="patient",
+        nullable=False
     )
+
 
     full_name: Mapped[str] = mapped_column(
         String(100),
-        nullable=False,
+        nullable=False
     )
+
 
     is_active: Mapped[bool] = mapped_column(
         Boolean,
-        default=True,
-        nullable=False,
+        default=True
     )
+
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
-        default=datetime.utcnow,
-        nullable=False,
-    )
-
-
-    patients = relationship(
-        "Patient",
-        back_populates="user",
-        cascade="all, delete-orphan",
+        default=datetime.utcnow
     )
 
 
     doctor = relationship(
         "Doctor",
         back_populates="user",
-        cascade="all, delete-orphan",
-        uselist=False,
+        uselist=False
+    )
+
+
+    patient = relationship(
+        "Patient",
+        back_populates="user",
+        uselist=False
     )
