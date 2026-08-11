@@ -1,0 +1,26 @@
+backend/.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+# Editor directories
+.vscode/
+.idea/
+
+# Backend virtualenvs
+backend/venv/
+backend/.venv/
+
+# Local sqlite DBs
+backend/ai_medical.db
+*.sqlite3
+
+# Testing and coverage
+.pytest_cache/
+coverage.xml
+htmlcov/
+
+# Logs and OS files
+*.log
+.DS_Store
+Thumbs.db
