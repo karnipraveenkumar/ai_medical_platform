@@ -1,0 +1,18 @@
+CAREFLOW HOSPITAL FRONTEND — QUICK START (Windows PowerShell)
+
+1. Extract the frontend folder into your existing repository root (the same level as backend/).
+2. Open a terminal in frontend/.
+3. Install packages:
+   npm install
+4. Create your local env file:
+   Copy-Item .env.example .env
+5. Make sure the backend is running in another terminal:
+   cd ..\backend
+   uvicorn app.main:app --reload --port 8000
+6. Start the frontend in the frontend terminal:
+   npm run dev
+7. Open http://localhost:5173
+
+If browser requests show a CORS error, configure FastAPI CORSMiddleware in backend/app/main.py to allow http://localhost:5173 and http://127.0.0.1:5173.
+
+Important: the Admin/Doctor/Patient selector previews UI roles only. Your current backend login response does not return a role, and the backend must enforce authorization before production use. KPI charts and appointment examples are demo data; Patients, Doctors, login/register and AI completion use API requests.

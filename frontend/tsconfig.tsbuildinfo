@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/components/Charts.tsx","./src/components/Sidebar.tsx","./src/components/Topbar.tsx","./src/lib/api.ts","./src/pages/AuthPage.tsx","./src/pages/DataPages.tsx","./src/pages/Overview.tsx"],"errors":true,"version":"5.8.3"}
